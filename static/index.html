@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebApp 部署管理</title>
+    <title>WebApp 部署管理 v2.0</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         * {
@@ -430,8 +430,8 @@
 <body>
     <div id="app">
         <div class="header">
-            <h1>🚀 WebApp 部署管理</h1>
-            <p>快速部署和管理你的 Web 应用</p>
+            <h1>🚀 WebApp 部署管理 <span style="font-size: 0.5em; color: var(--primary);">v2.0</span></h1>
+            <p>多 Agent 异步协作 · 智能难度评估 · 快速部署管理</p>
         </div>
 
         <!-- 错误提示 -->
@@ -1192,12 +1192,40 @@
                     }
                 },
                 copyKey(key) {
-                    navigator.clipboard.writeText(key).then(() => {
-                        alert('密钥已复制到剪贴板');
-                    }).catch(err => {
-                        console.error('复制失败:', err);
-                        alert('复制失败，请手动复制');
-                    });
+                    // 优先使用 Clipboard API（需要安全上下文）
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(key).then(() => {
+                            alert('密钥已复制到剪贴板');
+                        }).catch(err => {
+                            console.error('复制失败:', err);
+                            this.fallbackCopy(key);
+                        });
+                    } else {
+                        // Fallback：使用传统方法（支持非 HTTPS 环境）
+                        this.fallbackCopy(key);
+                    }
+                },
+                fallbackCopy(text) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-9999px';
+                    textArea.style.top = '-9999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful) {
+                            alert('密钥已复制到剪贴板');
+                        } else {
+                            alert('复制失败，请手动复制');
+                        }
+                    } catch (err) {
+                        console.error('Fallback 复制失败:', err);
+                        alert('复制失败，请手动复制: ' + text);
+                    }
+                    document.body.removeChild(textArea);
                 },
                 openPage(pageId) {
                     // 直接访问 Worker 上的页面（不走代理）

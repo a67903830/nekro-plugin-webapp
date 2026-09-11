@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nekro WebApp | AI-Powered Web Development</title>
+    <meta name="description" content="NekroAgent 官方 Web 开发插件 - 让 AI 拥有完整的前端开发能力">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: #0a0a0a;
+            --surface-elevated: #111;
+            --border: #1a1a1a;
+            --border-hover: #2a2a2a;
+            --text-primary: #ededed;
+            --text-secondary: #888;
+            --text-muted: #555;
+            
+            --accent-purple: #a855f7;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-orange: #f97316;
+            --accent-cyan: #06b6d4;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Ambient Background */
+        .ambient {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .ambient::before {
+            content: '';
+            position: absolute;
+            top: -40%; left: 30%;
+            width: 600px; height: 600px;
+            background: radial-gradient(ellipse, rgba(168, 85, 247, 0.06), transparent 70%);
+        }
+        
+        .ambient::after {
+            content: '';
+            position: absolute;
+            top: 20%; right: 20%;
+            width: 400px; height: 400px;
+            background: radial-gradient(ellipse, rgba(59, 130, 246, 0.04), transparent 70%);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* ===== Hero ===== */
+        .hero {
+            padding: 6rem 0 4rem;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.4rem 0.9rem;
+            border-radius: 99px;
+            margin-bottom: 2rem;
+        }
+        
+        .badge-dot {
+            width: 6px; height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 1.25rem;
+        }
+        
+        h1 .gradient {
+            background: linear-gradient(135deg, #fff 0%, #a855f7 60%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+
+        /* ===== Hero Buttons ===== */
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .hero-btn:hover {
+            border-color: var(--accent-purple);
+            background: rgba(168, 85, 247, 0.08);
+        }
+
+        .hero-btn svg {
+            width: 18px; height: 18px;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .hero-btn.primary {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            color: #fff;
+        }
+
+        .hero-btn.primary:hover {
+            background: #9333ea;
+            border-color: #9333ea;
+        }
+
+        .hero-btn-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-left: 0.25rem;
+        }
+
+        /* ===== Stats ===== */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 3.5rem;
+            margin-bottom: 5rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-top: 0.25rem;
+        }
+
+        /* ===== Pipeline ===== */
+        .pipeline-section {
+            margin-bottom: 5rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--accent-purple);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .pipeline-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            position: relative;
+        }
+
+        .pipeline {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .pipeline-step {
+            text-align: center;
+            position: relative;
+        }
+
+        .pipeline-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 28px;
+            right: -0.5rem;
+            width: calc(100% - 56px);
+            height: 1px;
+            background: linear-gradient(90deg, var(--border-hover), var(--border));
+            transform: translateX(100%);
+        }
+
+        .step-icon {
+            width: 56px; height: 56px;
+            margin: 0 auto 0.75rem;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .step-icon svg {
+            width: 24px; height: 24px;
+            stroke: var(--text-secondary);
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .pipeline-step:hover .step-icon {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        .pipeline-step:hover .step-icon svg {
+            stroke: var(--accent-purple);
+        }
+
+        .step-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .step-desc {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== Features ===== */
+        .features-section {
+            margin-bottom: 5rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.25s;
+        }
+        
+        .feature:hover {
+            border-color: var(--border-hover);
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .feature-icon {
+            width: 32px; height: 32px;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-icon svg {
+            width: 16px; height: 16px;
+            stroke: var(--text-secondary);
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .feature:hover .feature-icon svg {
+            stroke: var(--accent-purple);
+        }
+
+        .feature h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .feature p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        /* ===== Libraries ===== */
+        .libraries-section {
+            margin-bottom: 5rem;
+        }
+
+        .libraries-grid {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .lib-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.45rem 0.85rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .lib-badge:hover {
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+        }
+
+        .lib-badge.highlight {
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+        }
+
+        /* ===== Footer ===== */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-brand {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .footer-brand strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.25rem;
+        }
+        
+        .footer-links a {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-links svg {
+            width: 14px; height: 14px;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .pipeline {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+            
+            .pipeline-step::after {
+                display: none;
+            }
+            
+            .stats { gap: 2rem; }
+            .footer-content { flex-direction: column; text-align: center; }
+        }
+
+        @media (max-width: 480px) {
+            .pipeline {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient"></div>
+    
+    <div class="container">
+        <div class="hero">
+            <div class="badge">
+                <span class="badge-dot"></span>
+                NEKRO WEBAPP v2.0
+            </div>
+            
+            <h1>
+                <span class="gradient">AI-Driven</span><br>
+                Web Development
+            </h1>
+            
+            <p class="tagline">
+                描述你想要的网页，AI 自动完成代码编写、实时编译与边缘部署。<br>
+                从想法到上线，一句话搞定。
+            </p>
+
+            <div class="hero-buttons">
+                <a href="https://github.com/KroMiose/nekro-agent" target="_blank" class="hero-btn primary">
+                    <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    NekroAgent<span class="hero-btn-label">主应用</span>
+                </a>
+                <a href="https://github.com/KroMiose/nekro-plugin-webapp" target="_blank" class="hero-btn">
+                    <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    WebApp Plugin<span class="hero-btn-label">本插件</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value">React 18</div>
+                <div class="stat-label">Runtime</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">TypeScript</div>
+                <div class="stat-label">Language</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">~1min</div>
+                <div class="stat-label">Build Time</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">Edge</div>
+                <div class="stat-label">Deploy</div>
+            </div>
+        </div>
+
+        <div class="pipeline-section">
+            <div class="section-header">
+                <div class="section-tag">How it works</div>
+                <div class="section-title">Development Pipeline</div>
+            </div>
+            
+            <div class="pipeline-container">
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="step-icon">
+                            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <div class="step-title">Requirement</div>
+                        <div class="step-desc">自然语言描述</div>
+                    </div>
+                    
+                    <div class="pipeline-step">
+                        <div class="step-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                        </div>
+                        <div class="step-title">Analysis</div>
+                        <div class="step-desc">意图理解与规划</div>
+                    </div>
+                    
+                    <div class="pipeline-step">
+                        <div class="step-icon">
+                            <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        </div>
+                        <div class="step-title">Generate</div>
+                        <div class="step-desc">流式代码生成</div>
+                    </div>
+                    
+                    <div class="pipeline-step">
+                        <div class="step-icon">
+                            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        </div>
+                        <div class="step-title">Deploy</div>
+                        <div class="step-desc">边缘网络交付</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <div class="section-header">
+                <div class="section-tag">Core Features</div>
+                <div class="section-title">Architecture Highlights</div>
+            </div>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        </div>
+                        <h3>Async Task Engine</h3>
+                    </div>
+                    <p>后台独立运行，主对话完全不阻塞。支持进度追踪、中途反馈与任务取消。</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        </div>
+                        <h3>Streaming Tool Call</h3>
+                    </div>
+                    <p>纯文本协议输出，操作块完成后立即执行。错误即时打断，节省 Token 开销。</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                        </div>
+                        <h3>Progressive Tolerance</h3>
+                    </div>
+                    <p>DIFF 渐进式容错机制，自动修复空白差异。连续失败时智能降级为全量覆写。</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M3 15h6M6 12v6"/></svg>
+                        </div>
+                        <h3>Virtual File System</h3>
+                    </div>
+                    <p>完整的项目管理能力，支持多文件组织。自动提取导出信息，防止模块引用错误。</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <h3>Permission Isolation</h3>
+                    </div>
+                    <p>管理密钥与访问密钥分离，符合最小权限原则。支持多用户共享与协作。</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                        </div>
+                        <h3>Auto Iteration</h3>
+                    </div>
+                    <p>编译失败自动重试，最多 20 轮迭代修复。类型检查可选跳过，避免第三方库误报阻塞。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="libraries-section">
+            <div class="section-header">
+                <div class="section-tag">Pre-installed</div>
+                <div class="section-title">Ready-to-Use Libraries</div>
+            </div>
+            <div class="libraries-grid">
+                <span class="lib-badge highlight">React 18</span>
+                <span class="lib-badge highlight">TypeScript</span>
+                <span class="lib-badge">Tailwind CSS</span>
+                <span class="lib-badge">Framer Motion</span>
+                <span class="lib-badge">Zustand</span>
+                <span class="lib-badge">Three.js</span>
+                <span class="lib-badge">PixiJS</span>
+                <span class="lib-badge">Recharts</span>
+                <span class="lib-badge">Lucide Icons</span>
+                <span class="lib-badge">date-fns</span>
+                <span class="lib-badge">Lodash</span>
+                <span class="lib-badge">GSAP</span>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <strong>NekroAgent</strong> Plugin System
+                </div>
+                <div class="footer-links">
+                    <a href="https://github.com/KroMiose/nekro-agent" target="_blank">
+                        <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                        GitHub
+                    </a>
+                    <a href="https://doc.nekro.ai" target="_blank">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        Documentation
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

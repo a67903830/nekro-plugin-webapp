@@ -99,6 +99,7 @@ def create_router() -> APIRouter:
                     "host",
                     "connection",
                     "content-length",
+                    "accept-encoding",  # 防止 Worker 返回压缩响应
                 }
             }
 

@@ -1,15 +1,32 @@
 [project]
-name = "nekro-plugin-webapp"
-version = "1.0.0"
-description = "NekroAgent WebApp 快速部署插件 - 基于 Cloudflare Workers 的 HTML 页面托管服务"
+name = "nekro-webapp"
+version = "2.0.0"
+description = "AI 驱动的 Web 应用开发工具包 - 支持独立 CLI 和 NekroAgent 插件双模式"
 authors = [{ name = "KroMiose", email = "li_xiangff@163.com" }]
 readme = "README.md"
 requires-python = ">=3.10,<3.12"
 dependencies = [
-    "nekro-agent>=2.0.0",
+    # 核心依赖
     "httpx>=0.27.0",
     "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "openai>=1.0.0",
+    "toml>=0.10.0",
+    "loguru>=0.7.0",
+    # CLI & TUI
+    "click>=8.0.0",
+    "rich>=13.0.0",
+    "textual>=7.3.0",
 ]
+
+[project.optional-dependencies]
+# TUI 界面
+tui = ["textual>=0.40.0"]
+# nekro-agent 插件模式
+nekro = ["nekro-agent>=2.0.0"]
+
+[project.scripts]
+nekro-webapp = "cli.main:main"
 
 [project.urls]
 Repository = "https://github.com/KroMiose/nekro-plugin-webapp"
@@ -22,12 +39,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
-only-include = ["__init__.py"]
+packages = ["core", "services", "tools", "prompts", "runtime", "cli"]
 
-
-[tool.black]
-line-length = 128
 
 [tool.ruff]
 extend-exclude = []

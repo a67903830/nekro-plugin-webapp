@@ -18,3 +18,9 @@ database_id = "ce974d03-29a9-4dbe-8b5c-6b9a7de08b36" # 请替换为你的 Databa
 [vars]
 # 数据库初始化标志（Worker 首次运行时自动初始化）
 DB_INITIALIZED = "false"
+
+# 规则配置：将 HTML 文件作为文本模块导入
+[[rules]]
+type = "Text"
+globs = ["**/*.html"]
+fallthrough = false
