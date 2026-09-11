@@ -12,7 +12,7 @@ workers_dev = true
 [[d1_databases]]
 binding = "DB"
 database_name = "webapp-db"
-database_id = "ce974d03-29a9-4dbe-8b5c-6b9a7de08b36" # 请替换为你的 Database ID
+database_id = "4abe83c7-cb92-46de-b696-d1f0655694f5" # 请替换为你的 Database ID
 
 # 环境变量
 [vars]
